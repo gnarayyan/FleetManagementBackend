@@ -1,13 +1,13 @@
 #django
 from django.contrib.auth import login
-#rest
+#rest_framework
 from rest_framework import status
-from rest_framework.decorators import api_view
-from rest_framework.response import Response
 from rest_framework.views import APIView
-#other
-from .serializers import LoginSerializer
+from rest_framework.response import Response
 
+#serializers.py
+from .serializers import LoginSerializer
+from .serializers import UserSignupSerializer
 
 class LoginAPIView(APIView):
     '''
@@ -25,8 +25,14 @@ class LoginAPIView(APIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-        # serializer.is_valid(raise_exception=True)
-        # user = serializer.validated_data['user']
-        # login(request, user)
-        # return Response({'message': 'Login successful'}, status=status.HTTP_202_ACCEPTED)
-       
+class UserSignupAPIView(APIView):
+    '''
+    It is an endpoint to signup household users. The user can signup but will be activated only after the admin verifies it.
+    '''
+    def post(self, request):
+        serializer = UserSignupSerializer(data=request.data)
+        if serializer.is_valid():
+            user = serializer.save()
+            return Response({'message': 'User signup successful'}, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
