@@ -37,8 +37,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'account',
-    'rest_framework'
+	'corsheaders',
+    
+    'rest_framework',
+'account',
 ]
 
 MIDDLEWARE = [
@@ -49,7 +51,15 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+'corsheaders.middleware.CorsMiddleware'
 ]
+
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:3000',  # Replace with the URL of your Flutter app
+    # Add more allowed origins if needed
+]
+
+CORS_ORIGIN_ALLOW_ALL = True  
 
 ROOT_URLCONF = 'FleetManagementSystem.urls'
 
@@ -118,6 +128,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
 STATIC_URL = 'static/'
+
+MEDIA_URL = 'media/'
+MEDIA_ROOT = BASE_DIR / 'media'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field

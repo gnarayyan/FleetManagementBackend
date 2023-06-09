@@ -11,6 +11,6 @@ class UserProfileModel(models.Model):
     verification_status =  models.CharField(max_length=1, choices = [('V', 'Verified'),('U','Unverified')], default='U')
 
     def __str__(self):
-        verify_status = '✅' if self.verification_status=='V' else '❌'
+        verify_status = '✔' if self.verification_status=='V' else '❌'
         return self.user.username + ' - ' + verify_status
 
