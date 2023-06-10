@@ -1,0 +1,107 @@
+[
+  {
+    "model": "country_info.municipality",
+    "pk": 1,
+    "fields": { "name": "Budhanilkantha  ", "type": "U", "district": 28 }
+  },
+  {
+    "model": "country_info.municipality",
+    "pk": 2,
+    "fields": { "name": "Chandragiri  ", "type": "U", "district": 28 }
+  },
+  {
+    "model": "country_info.municipality",
+    "pk": 3,
+    "fields": { "name": "Dakshinkali  ", "type": "U", "district": 28 }
+  },
+  {
+    "model": "country_info.municipality",
+    "pk": 4,
+    "fields": { "name": "Gokarneshwor  ", "type": "U", "district": 28 }
+  },
+  {
+    "model": "country_info.municipality",
+    "pk": 5,
+    "fields": { "name": "Kageshwori Manahara  ", "type": "U", "district": 28 }
+  },
+  {
+    "model": "country_info.municipality",
+    "pk": 6,
+    "fields": { "name": "Kathmandu  ", "type": "M", "district": 28 }
+  },
+  {
+    "model": "country_info.municipality",
+    "pk": 7,
+    "fields": { "name": "Kirtipur  ", "type": "U", "district": 28 }
+  },
+  {
+    "model": "country_info.municipality",
+    "pk": 8,
+    "fields": { "name": "Nagarjun  ", "type": "U", "district": 28 }
+  },
+  {
+    "model": "country_info.municipality",
+    "pk": 9,
+    "fields": { "name": "Shankharapur  ", "type": "U", "district": 28 }
+  },
+  {
+    "model": "country_info.municipality",
+    "pk": 10,
+    "fields": { "name": "Tarkeshwor  ", "type": "U", "district": 28 }
+  },
+  {
+    "model": "country_info.municipality",
+    "pk": 11,
+    "fields": { "name": "Tokha  ", "type": "U", "district": 28 }
+  },
+  {
+    "model": "country_info.municipality",
+    "pk": 12,
+    "fields": { "name": "Bhaktapur", "type": "U", "district": 26 }
+  },
+  {
+    "model": "country_info.municipality",
+    "pk": 13,
+    "fields": { "name": "Changunarayan", "type": "U", "district": 26 }
+  },
+  {
+    "model": "country_info.municipality",
+    "pk": 14,
+    "fields": { "name": "Madhyapur Thimi", "type": "U", "district": 26 }
+  },
+  {
+    "model": "country_info.municipality",
+    "pk": 15,
+    "fields": { "name": "Suryabinayak", "type": "U", "district": 26 }
+  },
+  {
+    "model": "country_info.municipality",
+    "pk": 16,
+    "fields": { "name": "Bagmati", "type": "R", "district": 30 }
+  },
+  {
+    "model": "country_info.municipality",
+    "pk": 17,
+    "fields": { "name": "Godawari", "type": "U", "district": 30 }
+  },
+  {
+    "model": "country_info.municipality",
+    "pk": 18,
+    "fields": { "name": "Konjyosom", "type": "R", "district": 30 }
+  },
+  {
+    "model": "country_info.municipality",
+    "pk": 19,
+    "fields": { "name": "Lalitpur", "type": "M", "district": 30 }
+  },
+  {
+    "model": "country_info.municipality",
+    "pk": 20,
+    "fields": { "name": "Mahalaxmi", "type": "U", "district": 30 }
+  },
+  {
+    "model": "country_info.municipality",
+    "pk": 21,
+    "fields": { "name": "Mahankal", "type": "R", "district": 30 }
+  }
+]
