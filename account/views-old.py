@@ -1,7 +1,7 @@
 # django
 from django.contrib.auth import login
 # rest_framework
-from rest_framework import status, serializers
+from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 # serializers.py
@@ -28,20 +28,9 @@ class LoginAPIView(APIView):
             try:
                 profile = UserProfileModel.objects.get(user=user)
                 avatar_url = profile.avatar.url if profile.avatar else None
-                collection_route = profile.collection_route
+                collection_route = profile.collection_route if profile.collection_route else None
+                print('Coll_routr: ', collection_route)
 
-                if collection_route:
-                    collection_route_data = {
-                        'id': collection_route.id,
-                        'name': collection_route.name,
-                        # Add other relevant fields from the CollectionRoute model
-                    }
-                else:
-                    collection_route_data = None
-
-                # Serialize the collection_route_data
-                # serialized_collection_route = serializers.serialize(
-                #     'json', [collection_route_data])
                 # Return the desired fields in the response
                 return Response({
                     'message': 'Login successful',
@@ -49,7 +38,7 @@ class LoginAPIView(APIView):
                     'firstname': user.first_name,
                     'lastname': user.last_name,
                     'avatar': avatar_url[6:],
-                    'collection_route': collection_route_data,
+                    'collection_route': collection_route
                 }, status=status.HTTP_200_OK)
 
             except UserProfileModel.DoesNotExist:
