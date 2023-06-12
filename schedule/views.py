@@ -4,6 +4,21 @@ from .models import Schedule
 from .serializers import ScheduleSerializer
 
 
+from rest_framework import viewsets
+from .models import CollectionPoint, CollectionRoute
+from .serializers import CollectionPointSerializer, CollectionRouteSerializer
+
+
+class CollectionPointViewSet(viewsets.ModelViewSet):
+    queryset = CollectionPoint.objects.all()
+    serializer_class = CollectionPointSerializer
+
+
+class CollectionRouteViewSet(viewsets.ModelViewSet):
+    queryset = CollectionRoute.objects.all()
+    serializer_class = CollectionRouteSerializer
+
+
 class ScheduleListAPIView(generics.ListAPIView):
     serializer_class = ScheduleSerializer
 
