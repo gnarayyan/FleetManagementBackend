@@ -15,15 +15,18 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from waste.views import homepage
 # For Media
 from django.conf import settings
 from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/', include('account.urls')),
+    path('', homepage, name='homapage'),
+    path('api/account/', include('account.urls')),
     path('api/', include('schedule.urls')),
     path('api/waste/', include('waste.urls')),
+    path('api/info/', include('country_info.urls')),
 
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

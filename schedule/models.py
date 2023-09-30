@@ -13,8 +13,10 @@ class CollectionRoute(models.Model):
 
 
 class CollectionPoint(models.Model):
-    latitude = models.DecimalField(max_digits=9, decimal_places=6)
-    longitude = models.DecimalField(max_digits=9, decimal_places=6)
+    # models.DecimalField(max_digits=20, decimal_places=15)
+    latitude = models.CharField(max_length=256, default="")
+    # models.DecimalField(max_digits=20, decimal_places=15)
+    longitude = models.CharField(max_length=256, default="")
     name = models.CharField(max_length=100)
     collection_route = models.ForeignKey(
         CollectionRoute, on_delete=models.PROTECT)

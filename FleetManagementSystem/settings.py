@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
 from pathlib import Path
+from datetime import timedelta
+import socket  # for dev purpose only
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -25,7 +27,9 @@ SECRET_KEY = 'django-insecure-0d_263+n&_@#&qwu&li-^a#)9d7@#!-t3^6(@)$!7yky7a39-^
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+IP_OF_MY_PC = socket.gethostbyname(socket.gethostname())
+
+ALLOWED_HOSTS = [IP_OF_MY_PC, 'localhost', '127.0.0.1', '192.168.0.105']
 
 
 # Application definition
@@ -37,31 +41,35 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'corsheaders',
+    'django_extensions',
     'rest_framework',
+    'rest_framework_simplejwt',
+    'corsheaders',
     'account',
     'country_info',
     'schedule',
     'waste',
+
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'corsheaders.middleware.CorsMiddleware'
 ]
 
-CORS_ALLOWED_ORIGINS = [
-    'http://localhost:3000',  # Replace with the URL of your Flutter app
-    # Add more allowed origins if needed
-]
+# CORS_ALLOWED_ORIGINS = [
+#     'http://localhost:3000',  # Replace with the URL of your Flutter app
+#     # Add more allowed origins if needed
+# ]
 
-CORS_ORIGIN_ALLOW_ALL = True
+# CORS_ORIGIN_ALLOW_ALL = True
+CORS_ALLOW_ALL_ORIGINS = True
 
 ROOT_URLCONF = 'FleetManagementSystem.urls'
 
@@ -141,4 +149,18 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 REST_FRAMEWORK = {
     'COERCE_DECIMAL_TO_STRING': False,
+}
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+REST_FRAMEWORK = {
+    'COERCE_DECIMAL_TO_STRING': False,
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ],
+}
+# Settings for SimpleJWT Authentication
+# More at https://django-rest-framework-simplejwt.readthedocs.io/en/latest/settings.html
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=20),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
 }

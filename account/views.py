@@ -1,76 +1,109 @@
 # django
-from django.contrib.auth import login
+from django.contrib.auth import authenticate, login, logout
+from django.shortcuts import get_object_or_404
+
 # rest_framework
-from rest_framework import status, serializers
+from rest_framework import status, viewsets
 from rest_framework.views import APIView
 from rest_framework.response import Response
-# serializers.py
-from .serializers import LoginSerializer
-from .serializers import UserSignupSerializer
-# models.py
-from .models import UserProfileModel
-from schedule.models import CollectionRoute
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.decorators import action
+
+# JWT Auth
+from rest_framework_simplejwt.tokens import RefreshToken
+
+# models & serializers
+from . import serializers
+from . import models
 
 
-class LoginAPIView(APIView):
+class TestImage(viewsets.ModelViewSet):
+    serializer_class = serializers.TestImage
+    queryset = models.TestImage.objects.all()
+
+
+class UserProfile(viewsets.ModelViewSet):
+
+    serializer_class = serializers.UserProfile
+    queryset = models.UserProfileModel.objects.all()
+    # permission_classes = [IsAuthenticated]
+
+    # @action(detail=True, methods=['GET'])
+    # def user_profile_by_id(self, request, pk=None):
+    #     userprofile = get_object_or_404(self.queryset, user__id=pk)
+    #     serializer = self.get_serializer(userprofile)
+    #     return Response(serializer.data)
+    def retrieve(self, request, pk=None):
+        queryset = models.UserProfileModel.objects.filter(user__id=pk)
+        userprofile = get_object_or_404(queryset, user__id=pk)
+        serializer = serializers.UserProfile(userprofile)
+        return Response(serializer.data)
+
+    # def retrieve(self, request, pk=None):
+    #     queryset = models.UserProfileModel.objects.all()
+    #     userprofile = get_object_or_404(queryset, pk=pk)
+    #     serializer = serializers.UserProfile(userprofile)
+    #     return Response(serializer.data)
+
+
+class SignupAPIView(APIView):
     '''
-    It is an endpint to login all kinds of users. The user can be either Household User, Driver or Admin
+    It is an endpoint to signup users. The user can signup but will be activated only after the admin verifies it.
     '''
 
     def post(self, request):
-        serializer = LoginSerializer(data=request.data)
+        serializer = serializers.RegisterUserSerializer(data=request.data)
 
-        if serializer.is_valid():
-            user = serializer.validated_data['user']
+        if serializer.is_valid(raise_exception=True):
+            # print('DATA: ', serializer._validated_data)
+            user = serializer.create(serializer._validated_data)
+            return Response(
+                {'message': 'User signup successful', 'id': user.id}, status=status.HTTP_201_CREATED
+            )
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class LoginView(APIView):
+    '''
+    It is an endpint to login all kinds of users. The user can be either Household User, Driver or Admin.
+    After each successful login user gets tokens
+    '''
+
+    def post(self, request):
+        username = request.data['username']
+        password = request.data['password']
+
+        user = authenticate(request, username=username, password=password)
+        if user is not None:
             login(request, user)
 
-            # Retrieve UserProfile for the logged-in user
-            try:
-                profile = UserProfileModel.objects.get(user=user)
-                avatar_url = profile.avatar.url if profile.avatar else None
-                collection_route = profile.collection_route
+            refresh = RefreshToken.for_user(user)
+            tokens = {
+                'refresh': str(refresh),
+                'access': str(refresh.access_token),
+            }
+            return Response(
+                {
+                    'fullname': user.get_full_name(),
+                    'email': user.email,
+                    'id': user.pk,
+                    'username': user.get_username(),
+                    'tokens': tokens,
+                    'role': models.UserProfileModel.objects.get(user=user).role
+                },
+                status=status.HTTP_200_OK,
+            )
 
-                if collection_route:
-                    collection_route_data = {
-                        'id': collection_route.id,
-                        'name': collection_route.name,
-                        # Add other relevant fields from the CollectionRoute model
-                    }
-                else:
-                    collection_route_data = None
-
-                # Serialize the collection_route_data
-                # serialized_collection_route = serializers.serialize(
-                #     'json', [collection_route_data])
-                # Return the desired fields in the response
-                return Response({
-                    'message': 'Login successful',
-                    'username': user.username,
-                    'firstname': user.first_name,
-                    'lastname': user.last_name,
-                    'avatar': avatar_url[6:],
-                    'collection_route': collection_route_data,
-                }, status=status.HTTP_200_OK)
-
-            except UserProfileModel.DoesNotExist:
-                # Handle case where UserProfile does not exist for the user
-                return Response({'message': 'Login successful'}, status=status.HTTP_200_OK)
-
-            # generating tokens or setting session data
-            # return Response({'message': 'Login successful'}, status=status.HTTP_200_OK)
-        else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(
+            {'error': 'Invalid username or password'},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
 
 
-class UserSignupAPIView(APIView):
-    '''
-    It is an endpoint to signup household users. The user can signup but will be activated only after the admin verifies it.
-    '''
+class LogoutView(APIView):
+    permission_classes = [IsAuthenticated]
 
-    def post(self, request):
-        serializer = UserSignupSerializer(data=request.data)
-        if serializer.is_valid():
-            user = serializer.save()
-            return Response({'message': 'User signup successful'}, status=status.HTTP_201_CREATED)
-        else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    def post(self, request, format=None):
+        logout(request)
+        return Response(status=status.HTTP_200_OK)
