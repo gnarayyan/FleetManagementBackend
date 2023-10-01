@@ -29,7 +29,7 @@ DEBUG = True
 
 IP_OF_MY_PC = socket.gethostbyname(socket.gethostname())
 
-ALLOWED_HOSTS = [IP_OF_MY_PC, 'localhost', '127.0.0.1', '192.168.0.105']
+ALLOWED_HOSTS = [IP_OF_MY_PC, 'localhost', '127.0.0.1', '192.168.1.84']
 
 
 # Application definition
