@@ -26,6 +26,7 @@ urlpatterns = [
     path('api/account/', include('account.urls')),
     path('api/', include('schedule.urls')),
     path('api/waste/', include('waste.urls')),
+    path('api/notification/', include('notification.urls')),
     path('api/info/', include('country_info.urls')),
 
 

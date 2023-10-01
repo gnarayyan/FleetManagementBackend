@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'country_info',
     'schedule',
     'waste',
+    'notification'
 
 ]
 
