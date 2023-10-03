@@ -19,4 +19,9 @@ urlpatterns = [
     path('register/', include(router.urls)),
     path('register/user/', views.SignupAPIView.as_view()),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('user-profiles/',
+         views.UserProfileForSchedule.as_view({'get': 'list'}), name='user-profile-list'),
+    # path('user-profiles/', views.UserProfileForSchedule.as_view(),
+    #      name='user-profile-list'),
+
 ]

@@ -1,43 +1,107 @@
-from rest_framework import generics, status
+from rest_framework import generics, viewsets, status
 from rest_framework.response import Response
-from .models import Schedule
-from .serializers import ScheduleSerializer
 
+from . import models, serializers
+from notification.models import Device as DeviceNotificationModel
+from utils.push_notification import PushNotification
 
-from rest_framework import viewsets
-from .models import CollectionPoint, CollectionRoute
-from .serializers import CollectionPointSerializer, CollectionRouteSerializer
+notification = PushNotification()
 
 
 class CollectionPointViewSet(viewsets.ModelViewSet):
-    queryset = CollectionPoint.objects.all()
-    serializer_class = CollectionPointSerializer
+    queryset = models.CollectionPoint.objects.all()
+    serializer_class = serializers.CollectionPointSerializer
 
 
 class CollectionRouteViewSet(viewsets.ModelViewSet):
-    queryset = CollectionRoute.objects.all()
-    serializer_class = CollectionRouteSerializer
+    queryset = models.CollectionRoute.objects.all()
+    serializer_class = serializers.CollectionRouteSerializer
 
 
 class ScheduleListAPIView(generics.ListAPIView):
-    serializer_class = ScheduleSerializer
+    serializer_class = serializers.ScheduleSerializer
 
     def get_queryset(self):
         collection_route = self.request.query_params.get(
             'collection_route', None)
         if collection_route is not None:
-            queryset = Schedule.objects.filter(
+            queryset = models.Schedule.objects.filter(
                 collection_route=collection_route)
         else:
-            queryset = Schedule.objects.all()
+            queryset = models.Schedule.objects.all()
 
         return queryset.order_by('-schedule_at')
 
-    # def get_queryset(self):
-    #     collection_route = self.request.query_params.get(
-    #         'collection_route', None)
-    #     if collection_route is not None:
-    #         return Schedule.objects.filter(collection_route=collection_route)
-    #     else:
-    #         error_message = "Please provide a collection route to get notifications"
-    #         return Response({"error": error_message}, status=status.HTTP_400_BAD_REQUEST)
+
+class ScheduleFleet(viewsets.ModelViewSet):
+    queryset = models.ScheduleFleet.objects.all()
+    serializer_class = serializers.ScheduleFleet
+
+    def partial_update(self, request, pk=None):
+        instance = self.get_object()
+        status = request.data.get('status')
+        status = int(status) if status is not None else False
+        new_driver = request.data.get('driver')
+        new_driver = int(new_driver) if new_driver is not None else False
+
+        schedule = ScheduleFleet.objects.get(id=pk)
+        image_url = None if schedule.image == None else schedule.image.url
+
+        # If status=reject
+        if status == 2:
+            # send PN to admin
+            admin_token = DeviceNotificationModel.objects.get(
+                user__username='admin').token
+            title = 'Driver rejected the Request'
+            body = 'Please reschedule the work to another driver'
+            notification.send(admin_token, title, body, image=image_url)
+
+        # If status=accept
+        elif status == 1:
+            # send PN to admin
+            admin_token = DeviceNotificationModel.objects.get(
+                user__username='admin').token
+            title = 'Driver accepted the Request'
+            body = 'Now, all respective household users will be notified'
+            notification.send(admin_token, title, body, image=image_url)
+
+            # send PN to all household users of that collection route
+            tokens = DeviceNotificationModel.objects.filter(
+                user__userprofilemodel__collection_route=instance.collection_route).values_list('token', flat=True)
+            notification.sendAtBulk(
+                tokens=tokens, title=schedule.title, body=schedule.description, image=image_url)
+
+        # if driver is changed by admin
+        elif new_driver != instance.driver:
+            # send push notification to new driver
+            driver_token = DeviceNotificationModel.objects.get(
+                user=int(new_driver)).token
+            notification.send(driver_token, title=schedule.title,
+                              body=schedule.description, image=image_url)
+
+        # Perform the partial update using the serializer
+        serializer = self.get_serializer(
+            instance, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(status=status.HTTP_200_OK)
+
+    def create(self, request):
+        title = self.request.data['title']
+        body = self.request.data['description']
+        image = self.request.data['image']
+        driver = self.request.data['driver']
+
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        instance = serializer.save()  # Save the object
+        image_url = request.build_absolute_uri(instance.image.url)
+
+        driver_token = DeviceNotificationModel.objects.get(
+            user=int(driver)).token
+        # print('Created schedule img url: ', f'{image_url}')
+        #       f'{request.META["HTTP_HOST"]}{image_url}')
+        notification.send(driver_token, title=title,
+                          body=body, image=image_url)
+
+        return Response(status=status.HTTP_201_CREATED)

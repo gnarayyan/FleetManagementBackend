@@ -6,5 +6,7 @@ urlpatterns = [
         {'get': 'list', 'post': 'create'}), name='device-list'),
     path('<int:pk>/', views.Device.as_view(
         {'get': 'retrieve', 'put': 'update', 'delete': 'destroy', 'patch': 'partial_update'}), name='device-detail'),
+    path('user/<int:user>/',  views.GetDeviceByUser.as_view(),
+         name='get-user-by-id'),
 
 ]

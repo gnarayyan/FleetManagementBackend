@@ -1,7 +1,9 @@
 from django.contrib import admin
-from .models import CollectionPoint, CollectionRoute, Schedule, UserViewedSchedule
-# Register your models here.
-admin.site.register(CollectionPoint)
-admin.site.register(CollectionRoute)
-admin.site.register(Schedule)
-admin.site.register(UserViewedSchedule)
+from . import models
+
+
+admin.site.register(models.CollectionPoint)
+admin.site.register(models.CollectionRoute)
+admin.site.register(models.Schedule)
+admin.site.register(models.ScheduleFleet)
+admin.site.register(models.UserViewedSchedule)

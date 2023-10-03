@@ -3,7 +3,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.shortcuts import get_object_or_404
 
 # rest_framework
-from rest_framework import status, viewsets
+from rest_framework import status, viewsets, generics
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
@@ -107,3 +107,21 @@ class LogoutView(APIView):
     def post(self, request, format=None):
         logout(request)
         return Response(status=status.HTTP_200_OK)
+
+
+class UserProfileForSchedule(viewsets.ReadOnlyModelViewSet):
+    serializer_class = serializers.UserProfileForSchedule
+
+    def get_queryset(self):
+        role = self.request.query_params.get('role', None)
+        if role is not None:
+            return models.UserProfileModel.objects.filter(role=role)
+        return models.UserProfileModel.objects.all()
+
+
+# class UserProfileForSchedule(viewsets.ReadOnlyModelViewSet):
+#     serializer_class = serializers.UserProfileForSchedule
+
+#     def get_queryset(self):
+#         role = self.request.query_params.get('role')
+#         return models.UserProfileModel.objects.filter(role=role)

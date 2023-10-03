@@ -1,22 +1,17 @@
-from rest_framework import serializers
-from .models import Schedule
-# from django.utils import timezone
-# from django.utils.timesince import naturaltime
 from django.contrib.humanize.templatetags import humanize
-
 from rest_framework import serializers
-from .models import CollectionPoint, CollectionRoute
+from . import models
 
 
 class CollectionPointSerializer(serializers.ModelSerializer):
     class Meta:
-        model = CollectionPoint
+        model = models.CollectionPoint
         fields = '__all__'
 
 
 class CollectionRouteSerializer(serializers.ModelSerializer):
     class Meta:
-        model = CollectionRoute
+        model = models.CollectionRoute
         fields = '__all__'
 
 
@@ -25,7 +20,7 @@ class ScheduleSerializer(serializers.ModelSerializer):
     schedule_at = serializers.SerializerMethodField()
 
     class Meta:
-        model = Schedule
+        model = models.Schedule
         fields = ['title', 'description', 'schedule_for',
                   'related_actor', 'schedule_at']
 
@@ -35,3 +30,10 @@ class ScheduleSerializer(serializers.ModelSerializer):
     def get_schedule_at(self, obj):
         return humanize.naturaltime(obj.schedule_at)
     # naturaltime(timezone.now() - obj.schedule_for)
+
+
+class ScheduleFleet(serializers.ModelSerializer):
+    class Meta:
+        model = models.ScheduleFleet
+        fields = ('id', 'title', 'description', 'image', 'accepted_at',
+                  'status', 'collection_route', 'driver')

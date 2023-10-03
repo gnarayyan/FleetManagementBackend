@@ -5,4 +5,4 @@ from . import models
 class Device(serializers.ModelSerializer):
     class Meta:
         model = models.Device
-        fields = ('user', 'token', 'refresh_count', 'platform')
+        fields = ('id','user', 'token', 'refresh_count', 'platform')

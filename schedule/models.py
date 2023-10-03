@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from country_info.models import Municipality
+from utils.file_rename import File
 # Create your models here.
 
 
@@ -23,6 +24,29 @@ class CollectionPoint(models.Model):
 
     def __str__(self) -> str:
         return self.name
+
+
+class ScheduleFleet(models.Model):
+    class ScheduleStatus(models.IntegerChoices):
+        PENDING = 0, 'Pending'
+        ACCEPTED = 1, 'Accepted'
+        REJECTED = 2, 'Rejected'
+
+    title = models.CharField(max_length=256)
+    description = models.CharField(max_length=256)
+    image = models.ImageField(upload_to=File(
+        'notification/').rename, null=True, blank=True)
+    created_at = models.DateTimeField(auto_now=True)
+    accepted_at = models.DateTimeField(null=True, blank=True)
+    status = models.PositiveIntegerField(
+        choices=ScheduleStatus.choices, default=ScheduleStatus.PENDING)
+    collection_route = models.ForeignKey(
+        CollectionRoute, on_delete=models.PROTECT)
+    driver = models.ForeignKey(User, on_delete=models.PROTECT)
+
+    # def save(self, *args, **kwargs):
+    #     # Logic to send push notification to driver
+    #     super(ScheduleFleet, self).save(*args, **kwargs)
 
 
 class Schedule(models.Model):
